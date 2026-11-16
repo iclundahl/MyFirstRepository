@@ -1,0 +1,228 @@
+---
+title: "445_Assignment 1 - 9-28-26"
+author: "Ella Lundahl"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+## Exercises  {#Exercises_DataStructures}
+
+### Exercise 1 {-}
+
+Create a vector of three elements (2,4,6) and name that vector `vec_a`. Create a second vector, `vec_b`, that contains $(8,10,12)$. Add these two vectors together and name the result `vec_c`.
+
+```{r}
+vec_a <- c(2,4,6)
+vec_b <- c(8,10,12)
+vec_c <- vec_a + vec_b
+vec_c
+```
+### Exercise 2 {-}
+
+Create a vector, named `vec_d`, that contains only two elements (14,20). Add this vector to `vec_a`. What is the result and what do you think R did (look up the recycling rule using Google)? What is the warning message that R gives you?
+
+```{r}
+vec_d <- c(14,20)
+vec_a + vec_d
+```
+### When adding two vectors of different length, the recyling rule artifically lengths the shorter vector by repeating its elements until it is long enough for the vector addition to be done. R is giving me the warning that the lengh of vec_a is not a multiple of the length of vec_d. 
+
+### Exercise 3 {-}
+
+Next add $5$ to the vector `vec_a`. What is the result and what did R do? Why doesn't in give you a warning message similar to what you saw in the previous problem?
+
+```{r}
+vec_a + 5
+```
+### This doesn't give a warning because it isn't adding two vectors of different length, its adding a vector and a scalar so it just adds the value 5 to every element in the vector.
+
+### Exercise 5 {-}
+
+Generate the vector of even numbers $\left\{ 2,4,6,\dots,20\right\}$
+
+**a)** Using the `seq()` function and
+
+```{r}
+vec_even1 <- seq(from=2, to=20, by=2)
+vec_even1
+```
+
+**b)** Using the a:b shortcut and some subsequent algebra. *Hint: Generate a sequence of integers then multiple by 2*.
+
+```{r}
+vec_even2 <- 1:10 * 2
+vec_even2
+```
+
+### Exercise 6 {-}
+
+Generate a vector of $21$ elements that are evenly placed between $0$ and $1$ using the `seq()` command and name this vector `x`. 
+
+```{r}
+x <- seq(from=0, to=1, length.out = 21)
+x
+```
+
+
+### Exercise 8 {-}
+
+Generate the vector $\left\{ 2,2,2,2,4,4,4,4,8,8,8,8\right\}$ using the `rep()` command. You might need to check the help file for `rep()`. In particular, look at the optional argument `each=`.
+
+```{r}
+vec_8 <- rep(seq(from=2, to=8, by=2), each=4 ) 
+vec_8
+```
+
+
+### Exercise 11 {-}
+
+Create and manipulate a data frame.
+
+**a)** Create a `data.frame` named `my.trees` that has the following columns:
+
+  + Girth = {8.3, 8.6, 8.8, 10.5, 10.7, 10.8, 11.0}
+  + Height= {70, 65, 63, 72, 81, 83, 66}
+  + Volume= {10.3, 10.3, 10.2, 16.4, 18.8, 19.7, 15.6}
+  
+Complete the following without using `dplyr` functions
+
+```{r}
+my.trees <- data.frame(
+  Girth  = c(8.3, 8.6, 8.8, 10.5, 10.7, 10.8, 11.0),   
+  Height = c(70, 65, 63, 72, 81, 83, 66),
+  Volume = c(10.3, 10.3, 10.2, 16.4, 18.8, 19.7, 15.6)
+)
+
+my.trees
+```
+
+
+**b)** Extract the third observation (i.e. the third row)
+
+```{r}
+my.trees[3,]
+```
+
+
+**c)** Extract the Girth column referring to it by name (don't use a numerical value based on column position).
+
+```{r}
+my.trees$Girth
+```
+
+**d)** Print out a data frame of all the observations *except* for the fourth observation. (i.e. Remove the fourth observation/row.)
+
+```{r}
+my.trees[-4,]
+```
+
+
+**e)** Use the `which()` command to create a vector of row indices that have a `girth` greater than 10. Call that vector `index`.
+
+```{r}
+index <- which(my.trees$Girth > 10 )
+index
+```
+
+**f)** Use the `index` vector to create a small data set with just the large girth trees.
+
+```{r}
+my.bigtrees <- my.trees[index, ]
+my.bigtrees
+```
+
+
+**g)** Use the `index` vector to create a small data set with just the small girth trees.
+
+```{r}
+my.smalltrees <- my.trees[-index,]
+my.smalltrees
+```
+
+
+### Exercise 12 {-}
+
+The following code creates a `data.frame` and then has two different methods for removing the rows with `NA` values in the column `Grade`. Explain the difference between the two.
+
+```{r}
+df <- data.frame(name= c('Alice','Bob','Charlie','Daniel'),
+                 Grade = c(6,8,NA,9))
+
+df[ -which(  is.na(df$Grade) ), ]
+df[  which( !is.na(df$Grade) ), ]
+```
+The first one is using the "-" before the which command to essentially subract the data that meets the criteria in the which statement. The second one is using the "!" as the logical operator for NOT as to pull all the data that is NOT the criteria in the which statement. 
+    
+### Exercise 14 {-}
+
+Create and manipulate a list.
+
+**a)** Create a list named my.test with elements
+
+  + x = c(4,5,6,7,8,9,10)
+  + y = c(34,35,41,40,45,47,51)
+  + slope = 2.82
+  + p.value = 0.000131
+  
+```{r}
+x  <- c(4,5,6,7,8,9,10)
+y <- c(34,35,41,40,45,47,51)
+slope <- 2.82
+p.value <- 0.000131
+my.test <- list(x=x, y=y, Slope=slope, P.Value=p.value) 
+str(my.test) 
+```
+
+  
+**b)** Extract the second element in the list.
+
+```{r}
+my.test[[2]]
+```
+
+
+**c)** Extract the element named `p.value` from the list.
+
+```{r}
+my.test$P.Value
+```
+
+
+### Exercise 15 {-}
+
+The function `lm()` creates a linear model, which is a general class of model that includes both regression and ANOVA. We will call this on a data frame and examine the results. For this problem, there isn't much to figure out, but rather the goal is to recognize the data structures being used in common analysis functions.
+
+**a)** There are many data sets that are included with R and its packages. One of which is the `trees` data which is a data set of $n=31$ cherry trees. Load this data set into your current workspace using the command:
+
+```{r}
+data(trees)
+```
+
+**b)** Examine the data frame using the `str()` command. Look at the help file for the data using the command `help(trees)` or `?trees`.
+
+```{r}
+str(trees)
+```
+
+
+**c)** Perform a regression relating the volume of lumber produced to the girth and height of the tree using the following command
+
+```{r}
+m <- lm( Volume ~ Girth + Height, data=trees)
+```
+
+**d)** Use the `str()` command to inspect `m`. Extract the model coefficients from this list.
+
+```{r}
+str(m)
+m$coefficients
+```
+
+
+

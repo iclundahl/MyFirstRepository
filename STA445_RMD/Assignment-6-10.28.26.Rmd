@@ -1,0 +1,148 @@
+---
+title: "Assignment 6"
+author: "Ella Lundahl"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(forcats)
+library(nycflights13)
+```
+
+### Exercise 1 {-}
+
+A common task is to take a set of data that has multiple categorical variables and create a table of the number of cases for each combination. An introductory statistics textbook contains a data set summarizing student surveys from several sections of an intro class. The two variables of interest are `Gender` and `Year` which are the students gender and year in college. *Note: you will need to refer to Chapter 4 and Chapter 7 for some of the operations needed below - this is a great time to review chapter 4!*
+
+**a)** Download the data set using the following:
+
+```{r}
+Survey <- read.csv('https://www.lock5stat.com/datasets2e/StudentSurvey.csv', na.strings=c('',' ')) 
+```
+
+**b)** Select the specific columns of interest **Year** and **Gender**
+
+```{r}
+Survey <- Survey %>% 
+                select(Year, Gender)
+```
+
+
+**c)** Convert the **Year** column to factors and properly order the factors based on common US progression (FirstYear - Sophomore - Junior - Senior)
+
+```{r}
+Survey <- Survey %>%
+  mutate (Year = factor(Year)) 
+
+
+Survey <- Survey %>%
+  mutate( Year = fct_relevel(Year, 'FirstYear', 'Sophomore', 'Junior', 'Senior'))
+
+```
+
+
+**d)** Convert the **Gender** column to factors and rename them Male/Female.
+
+```{r}
+Survey <- Survey %>% 
+  mutate(Gender = factor(Gender))
+
+Survey <- Survey %>% 
+  mutate(Gender = fct_recode(Gender, Female = "F", Male = "M"))
+  ##mutate(fct_recode(Gender, Male = "M"))
+```
+
+**e)** Produce a data set with eight rows and three columns that contains the number of responses for each gender:year combination. *You might want to look at the following functions: `dplyr::count` and `dplyr::drop_na`.*
+
+```{r}
+Survey_response <- Survey %>%
+  drop_na(Gender, Year) %>%
+  count(Gender, Year)
+
+Survey_response
+
+# dplyr::drop_na(Survey) Gives error: "is not an exported object fromnamespace:dplyr"
+#When I looked at the help for 'drop_na' it said it was in tidyr not dplyr so i used that instead
+```
+
+
+**f)** Pivot the table in part (e) to produce a table of the number of responses in the following form:
+        
+|   Gender    |  First Year  |  Sophomore  |  Junior   |  Senior   |
+|:-----------:|:------------:|:----------:|:---------:|:---------:|
+|  **Female** |              |            |           |           |  
+|  **Male**   |              |            |           |           | 
+    
+```{r}
+Survey_response_wide <- Survey_response %>%
+  pivot_wider(names_from=Year, values_from=n)
+
+Survey_response_wide
+```
+
+### Exercise 3 {-} 
+
+For this problem we will consider two simple data sets.
+
+```{r}
+A <- tribble(
+  ~Name, ~Car,
+  'Alice', 'Ford F150',
+  'Bob',   'Tesla Model III',
+  'Charlie', 'VW Bug')
+
+B <- tribble(
+  ~First.Name, ~Pet,
+  'Bob',  'Cat',
+  'Charlie', 'Dog',
+  'Alice', 'Rabbit')
+```
+
+**a)** Combine the data frames together to generate a data set with three rows and three columns using `join` commands. 
+
+```{r}
+Combined <- A %>% 
+  inner_join(B, by = c("Name"= "First.Name"))
+
+Combined
+```
+
+
+**b)** It turns out that Alice also has a pet guinea pig. Add another row to the `B` data set. Do this using either the base function `rbind`, or either of the `dplyr` functions `add_row` or `bind_rows`.
+
+```{r}
+B <- B %>% 
+  add_row(First.Name = "Alice", Pet = "Guinea pig")
+
+B
+```
+
+
+**c)** Combine again the `A` and `B` data sets together to generate a data set with four rows and three columns using `join` commands.
+
+```{r}
+Recombined <- A %>% 
+  inner_join(B, by = c("Name"= "First.Name"))
+
+Recombined
+```
+
+### Exercise 4 {-} 
+
+The package `nycflights13` contains information about all the flights that arrived in or left from New York City in 2013. This package contains five data tables, but there are three data tables we will work with. The data table `flights` gives information about a particular flight, `airports` gives information about a particular airport, and `airlines` gives information about each airline. Create a table of all the flights on February 14th by Virgin America that has columns for the carrier, destination, departure time, and flight duration. Join this table with the airports information for the destination. Notice that because the column for the destination airport code doesn't match up between `flights` and `airports`, you'll have to use the `by=c("TableA.Col"="TableB.Col")` argument where you insert the correct names for `TableA.Col` and `TableB.Col`.
+    
+```{r}
+data("flights")
+data("airports")
+data("airlines")
+
+VA_Feb14 <- flights %>% 
+  filter(month == 2, day == 14, carrier == 'VX') %>%
+  select(carrier, dest, dep_time, air_time) %>% 
+  left_join(airports, by = c("dest" = "faa"))
+
+head(VA_Feb14)
+```
+

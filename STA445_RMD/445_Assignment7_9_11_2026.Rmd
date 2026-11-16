@@ -1,0 +1,122 @@
+---
+title: "Assingment 7"
+author: "Ella Lundahl"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(datasets)
+library(RColorBrewer)
+library(broom)
+```
+
+### Exercise 2 {-}
+
+Using the `datasets::trees` data, complete the following. This question refreshes create a linear model, graphing the linear model, and introduces using some LaTeX expressions on the graph.
+
+```{r}
+data(trees)
+ 
+```
+
+**a)** Create a regression model for $y=$ `Volume` as a function of $x=$ `Height`.
+
+```{r}
+model.trees <- lm(Volume ~ Height, data = trees ) 
+```
+
+**b)** Display the `summary` of the  model to view the y-intercept and slope of the regression line.
+
+```{r}
+summary(model.trees)
+```
+
+**c)** Using `ggplot2`, create a scatter plot of Volume vs Height. 
+
+```{r}
+
+ggplot(trees, aes(x=Height, y=Volume)) +
+  geom_point()
+
+```
+
+
+**d)** Color the scatter using the `Girth` variable.
+
+```{r}
+ggplot(trees, aes(x=Height, y=Volume, color=Girth)) +
+  geom_point()
+```
+
+
+**e)** Modify the color scheme using a RColorBrewer palette.
+
+```{r}
+ggplot(trees, aes(x=Height, y=Volume, color=Girth)) +
+  geom_point() + 
+  scale_color_continuous(palette = 'Dark2')
+```
+
+
+**f)** Create a nice white filled rectangle to add text information. The following might be useful.
+
+```{r}
+ggplot(trees, aes(x=Height, y=Volume, color=Girth)) +
+  geom_point() + 
+  scale_color_continuous(palette = 'Dark2')+ 
+  annotate('rect', xmin=65, xmax=75, ymin=60, ymax=74,
+         fill='white', color='black')
+```
+
+**g)** Use the `broom` package to extract the coefficients of the best-fit line. Add this information as an annotation to the graph, which should follow a form that looks like $\hat{y}_i = (INTERCEPT) + (SLOPE)* x_i$. Place the annotation within the white text box.
+
+```{r}
+annotation <- tidy(model.trees)
+
+intercept <- round(annotation$estimate[1], 2)
+slope <- round(annotation$estimate[2], 2)
+
+equation <- paste0("hat(y)[i] == ", intercept, " + ", slope, "*x[i]")
+
+ggplot(trees, aes(x = Height, y = Volume, color = Girth)) +
+  geom_point() +
+  scale_color_continuous(palette = "Dark2") +
+  annotate("rect", xmin = 65, xmax = 75, ymin = 60, ymax = 74,
+           fill = "white", color = "black") +
+  annotate("text", x = 70, y = 67, label = equation,
+           parse = TRUE, color = "black")
+```
+
+**h)** Use the `broom` package to extract the coefficient of determination $r^2$ from the model. Add the annotation to your graph, which should look something like $R^2 = (VALUE)$
+
+```{r}
+
+```
+
+
+**i)** Add the regression line in red. There are several ways to do this.
+
+**j)** Properly label the axes of the graph.
+
+**k)** Add a descriptive title to the graph.
+
+```{r}
+ggplot(trees, aes(x = Height, y = Volume, color = Girth)) +
+  geom_point() +
+  scale_color_continuous(palette = "Dark2") +
+  annotate("rect", xmin = 65, xmax = 75, ymin = 60, ymax = 74,
+           fill = "white", color = "black") +
+  annotate("text", x = 70, y = 67, label = equation,
+           parse = TRUE, color = "black")+ 
+  geom_smooth(method = "lm", formula = y ~ x,
+            se = FALSE, color = "black") +
+  labs(title = "Tree Volume vs. Height",
+     x = "Height (ft)",
+     y = "Volume (cubic ft)",
+     color = "Girth (in)")
+```
+
+       
